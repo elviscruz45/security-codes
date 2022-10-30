@@ -4,8 +4,32 @@ const SECURITY_CODE="paradigma"
 
 function UseReducer({name}){
     const [state,dispatch]=React.useReducer(reducer,initialState)
-
     console.log(state)
+
+
+    const onConfirm = () => {
+        dispatch({type:actionTypes.confirm})
+      };
+    
+      const onError = () => {
+        dispatch({type:actionTypes.error})
+      };
+    
+      const onWrite = ({target:{value}}) => {
+        dispatch({type:actionTypes.write,payload:value})
+      }
+    
+      const onCheck = () => {
+        dispatch({type:actionTypes.check})
+      };
+    
+      const onDelete = () => {
+        dispatch({type:actionTypes.delete})
+      };
+    
+      const onReset = () => {
+        dispatch({type:actionTypes.reset})
+      };
 
  React.useEffect(()=>{
         console.log("Empezando el efecto")
@@ -14,9 +38,9 @@ function UseReducer({name}){
             console.log("Haciendo la validacion")
 
             if(state.value===SECURITY_CODE){
-                dispatch({type:"CONFIRM"})
+                onConfirm()
             }else{
-                dispatch({type:"ERROR"})
+                onError()
             }
             
             console.log("Terminando la validacion")
@@ -42,36 +66,22 @@ function UseReducer({name}){
             <input 
             placeholder="Codigo de seguridad"
             value={state.value}
-            onChange={(event)=>{
-                dispatch({type:"WRITE",payload:event.target.value})
-                //onWrite(event.target.value)
-            }}
+            onChange={onWrite}
             />
-            <button onClick={()=>{
-                dispatch({type:"CHECK"})
-                
-
-                }}> comprobar</button>
+            <button onClick={onCheck}> comprobar</button>
         </div>
     )}else if(!!state.confirmed && !state.deleted){
         return(
             <React.Fragment>
                 <p> Pedimos confirmaicon, estsa seguro?</p>
                 <button
-                onClick={()=>{
-                    dispatch({type:"DELETE"})
-
-
-                    }}>
+                onClick={onDelete}>
                 
                 Si, eliminar
 
                 </button>
                 <button
-                  onClick={()=>{
-                    dispatch({type:"RESET"})
-
-                }}
+                  onClick={onReset}
                 > No, estoy arrepentido</button>
             </React.Fragment>
         )
@@ -80,9 +90,7 @@ function UseReducer({name}){
             <React.Fragment>
                 <p> Estado de eliminado con exito</p>
                 <button
-                  onClick={()=>{
-                    dispatch({type:"RESET"})
-                }}
+                  onClick={onReset}
                 >Resetear, volver atras</button>
             </React.Fragment>
         )
@@ -92,49 +100,56 @@ function UseReducer({name}){
 // use reducer
 
 const initialState= {
-    value:'paradigma',
+    value:'',
     error:false,
     loading:false,
     deleted:false,
     confirmed:false
-
 }
+
+const actionTypes={
+    confirm:"CONFIRM",
+    error:"ERROR",
+    write:"WRITE",
+    check:"CHECK",
+    delete:"DELETE",
+    reset:"RESET",
+}
+
 
 const reducerOBJECT = (state,payload) => ({
 
-    'CONFIRM': {
+    [actionTypes.confirm]: {
         ...state,
         error: false,
         loading: false,
         confirmed: true,
     },
-    'ERROR': {
+    [actionTypes.error]: {
         ...state,
         error: true,
         loading: false,
     },
-    "WRITE":{
+    [actionTypes.write]:{
         ...state,
         value:payload
     },
-    "CHECK":{
+    [actionTypes.check]:{
         
         ...state,
         loading:true,
     },
-    "DELETE":{
+    [actionTypes.delete]:{
         
         ...state,
         deleted:true,
     },
-    "RESET":{
+    [actionTypes.reset]:{
         ...state,
         confirmed:false,
         deleted:false,
         value:""
     },
-
-
  })
   
 const reducer = (state, action) => {
@@ -146,6 +161,5 @@ if (reducerOBJECT(state,action)[action.type]) {
     }
 }
 }
-
-
 export { UseReducer}
+
